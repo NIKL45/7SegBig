@@ -2,8 +2,11 @@
 #include "sevSeg.h"
 
 unsigned long PreviousMillis = 0;
-const long Interval = 25;
-
+const long Interval = 2;
+int Index = 0;
+const char *Number;
+int NumberOnlyLen;
+int DotPos;
 
 //NUMBER:
 const uint8_t SEG[12] = {
@@ -119,14 +122,92 @@ void sevSeg::SegWrite(int digit, int SegNumber)
   }
 }
 
-void sevSeg::print(char * Print)
+// ToDo: void sevSeg::print(double )
+// char Tmp[18];
+// String TmpStr = String(double );
+// TmpStr.toCharArray(Tmp, 18);
+
+void sevSeg::printNum(float Num)
 {
-  for (byte i = 0; i < sizeof(Print) - 1; i++)
+  char Tmp[100];
+  String TmpStr = String(Num);
+  TmpStr.toCharArray(Tmp, 100);
+  sevSeg::printChar(Tmp);
+}
+
+void sevSeg::printNum(long Num)
+{
+  char Tmp[100];
+  String TmpStr = String(Num);
+  TmpStr.toCharArray(Tmp, 100);
+  sevSeg::printChar(Tmp);
+}
+
+void sevSeg::printNum(unsigned long Num)
+{
+  char Tmp[100];
+  String TmpStr = String(Num);
+  TmpStr.toCharArray(Tmp, 100);
+  sevSeg::printChar(Tmp);
+}
+
+void sevSeg::printNum(short Num)
+{
+  char Tmp[100];
+  String TmpStr = String(Num);
+  TmpStr.toCharArray(Tmp, 100);
+  sevSeg::printChar(Tmp);
+}
+
+void sevSeg::printNum(double Num)
+{
+  char Tmp[100];
+  String TmpStr = String(Num);
+  TmpStr.toCharArray(Tmp, 100);
+  sevSeg::printChar(Tmp);
+}
+
+void sevSeg::printNum(int Num)
+{
+  char Tmp[100];
+  String TmpStr = String(Num);
+  TmpStr.toCharArray(Tmp, 100);
+  sevSeg::printChar(Tmp);
+}
+
+void sevSeg::printNum(unsigned int Num)
+{
+  char Tmp[100];
+  String TmpStr = String(Num);
+  TmpStr.toCharArray(Tmp, 100);
+  sevSeg::printChar(Tmp);
+}
+
+
+void sevSeg::printChar(char *Print)
+{
+
+  NumberOnlyLen = strlen(Print);
+  for (int i = 0; i <= strlen(Print); i++)
   {
-    Serial.print(Print[i]);
+    if (Print[i] == '.')
+    {
+      NumberOnlyLen = NumberOnlyLen - 1;
+      DotPos = i;
+    }
   }
 
-  Serial.println(sizeof(Print));
+  if ((NumberOnlyLen > 6 && Print[0] != '-') || (NumberOnlyLen > 7 && Print[0] == '-') || (NumberOnlyLen < strlen(Print) - 1))
+  {
+    Number = "-......";
+  }
+  else
+  {
+    Number = Print;
+  }
+
+  // Serial.print("len: ");
+  // Serial.println(strlen(Number));
 }
 
 void sevSeg::multiplex()
@@ -134,7 +215,183 @@ void sevSeg::multiplex()
 
   if (millis() - PreviousMillis >= Interval)
   {
+    if (Number[0] == '-')
+    {
 
+      SegWrite(6, 8);
+    }
+
+    if (Number[Index] == '0')
+    {
+      if (Index <= DotPos)
+      {
+        SegWrite((strlen(Number) - Index - 1) - 1, 0);
+      }
+      else
+      {
+        SegWrite((strlen(Number) - Index) - 1, 0);
+      }
+    }
+    else
+    {
+      if (Number[Index] == '1')
+      {
+        if (Index <= DotPos)
+        {
+          SegWrite((strlen(Number) - Index - 1) - 1, 1);
+        }
+        else
+        {
+          SegWrite((strlen(Number) - Index) - 1, 1);
+        }
+      }
+      else
+      {
+        if (Number[Index] == '2')
+        {
+          if (Index <= DotPos)
+          {
+            SegWrite((strlen(Number) - Index - 1) - 1, 2);
+          }
+          else
+          {
+            SegWrite((strlen(Number) - Index) - 1, 2);
+          }
+        }
+        else
+        {
+          if (Number[Index] == '3')
+          {
+            if (Index <= DotPos)
+            {
+              SegWrite((strlen(Number) - Index - 1) - 1, 3);
+            }
+            else
+            {
+              SegWrite((strlen(Number) - Index) - 1, 3);
+            }
+          }
+          else
+          {
+            if (Number[Index] == '4')
+            {
+              if (Index <= DotPos)
+              {
+                SegWrite((strlen(Number) - Index - 1) - 1, 4);
+              }
+              else
+              {
+                SegWrite((strlen(Number) - Index) - 1, 4);
+              }
+            }
+            else
+            {
+              if (Number[Index] == '5')
+              {
+                if (Index <= DotPos)
+                {
+                  SegWrite((strlen(Number) - Index - 1) - 1, 5);
+                }
+                else
+                {
+                  SegWrite((strlen(Number) - Index) - 1, 5);
+                }
+              }
+              else
+              {
+                if (Number[Index] == '6')
+                {
+                  if (Index <= DotPos)
+                  {
+                    SegWrite((strlen(Number) - Index - 1) - 1, 6);
+                  }
+                  else
+                  {
+                    SegWrite((strlen(Number) - Index) - 1, 6);
+                  }
+                }
+                else
+                {
+                  if (Number[Index] == '7')
+                  {
+                    if (Index <= DotPos)
+                    {
+                      SegWrite((strlen(Number) - Index - 1) - 1, 7);
+                    }
+                    else
+                    {
+                      SegWrite((strlen(Number) - Index) - 1, 7);
+                    }
+                  }
+                  else
+                  {
+                    if (Number[Index] == '8')
+                    {
+                      if (Index <= DotPos)
+                      {
+                        SegWrite((strlen(Number) - Index - 1) - 1, 8);
+                      }
+                      else
+                      {
+                        SegWrite((strlen(Number) - Index) - 1, 8);
+                      }
+                    }
+                    else
+                    {
+                      if (Number[Index] == '9')
+                      {
+                        if (Index <= DotPos)
+                        {
+                          SegWrite((strlen(Number) - Index - 1) - 1, 9);
+                        }
+                        else
+                        {
+                          SegWrite((strlen(Number) - Index) - 1, 9);
+                        }
+                      }
+                      else
+                      {
+                        if (Number[Index] == '.')
+                        {
+                          SegWrite((strlen(Number) - Index) - 1, 10);
+                        }
+                        else
+                        {
+                          // if (Number[Index] == ' ')
+                          // {
+                          //   SegWrite((strlen(Number) - Index) - 1, 11);
+                          // }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    ////////////////////////////////
+
+    if (NumberOnlyLen > 6 && Number[0] != '-' && Index <= 1)
+    {
+      Index = 6;
+    }
+    else if (NumberOnlyLen > 7 && Number[0] == '-' && Index <= 1)
+    {
+      Index = 7;
+    }
+    else if (Index <= 0)
+    {
+      Index = (strlen(Number) - 1);
+    }
+    else
+    {
+      Index--;
+    }
+    //Serial.println(Index);
     PreviousMillis = millis();
   }
 }
