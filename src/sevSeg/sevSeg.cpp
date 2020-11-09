@@ -1,58 +1,71 @@
 #include "Arduino.h"
 #include "sevSeg.h"
 
-unsigned long PreviousMillis = 0;
-const long Interval = 2;
-int Index = 0;
-const char *Number;
-int NumberWthoutDot;
-int DotPos;
+/////  Variables defined as private in sevSeg.h
+//
+// unsigned long PreviousMillis = 0;
+// const long Interval = 2;
+// int Index = 0;
+// const char *Number;
+// int NumberWthoutDot;
+// int DotPos;
+// bool ErrorChar = 0;
 
-//NUMBER:
-const uint8_t SEG[12] = {
-    B00000, // 0   A B C D DP
-    B00010, // 1
-    B00100, // 2
-    B00110, // 3
-    B01000, // 4
-    B01010, // 5
-    B01100, // 6
-    B01110, // 7
-    B10000, // 8
-    B10010, // 9
-    B11111, // .
-    B11110  // nothing
-};
+// int a0;
+// int a1;
+// int a2;
+// int a3;
+// int a;
+// int b;
+// int c;
+// int d;
+// int dp;
 
-//DIGIT:
-const uint8_t DIGIT[8] = {
-    B0000, // 0.   A3 A2 A1 A0
-    B0001, // 1.
-    B0010, // 2.
-    B0011, // 3.
-    B0100, // 4.
-    B0101, // 5.
-    B0110, // 6.
-    B1111  // nothing
-};
+// //NUMBER:
+// const uint8_t SEG[12] = {
+//     B00000, // 0   A B C D DP
+//     B00010, // 1
+//     B00100, // 2
+//     B00110, // 3
+//     B01000, // 4
+//     B01010, // 5
+//     B01100, // 6
+//     B01110, // 7
+//     B10000, // 8
+//     B10010, // 9
+//     B11111, // .
+//     B11110  // nothing
+// };
+
+// //DIGIT:
+// const uint8_t DIGIT[8] = {
+//     B0000, // 0.   A3 A2 A1 A0
+//     B0001, // 1.
+//     B0010, // 2.
+//     B0011, // 3.
+//     B0100, // 4.
+//     B0101, // 5.
+//     B0110, // 6.
+//     B1111  // nothing
+// };
 
 //--------------------------------------------------//
 //////////////////////////////////////////////////////
 //--------------------------------------------------//
 
-sevSeg::sevSeg()
+sevSeg::sevSeg(int A0, int A1, int A2, int A3, int A, int B, int C, int D, int DP)
 {
   // PINS:
-#define A0 15
-#define A1 14
-#define A2 13
-#define A3 12
+ a0 = A0;
+ a1 = A1;
+ a2 = A2;
+ a3 = A3;
 
-#define A 4
-#define B 5
-#define C 18
-#define D 19
-#define DP 21
+ a = A;
+ b = B;
+ c = C;
+ d = D;
+ dp = DP;
 }
 
 //--------------------------------------------------//
@@ -60,23 +73,24 @@ sevSeg::sevSeg()
 void sevSeg::init()
 {
   // HEF4028 --> digit
-  pinMode(A3, OUTPUT);
-  pinMode(A2, OUTPUT);
-  pinMode(A1, OUTPUT);
-  pinMode(A0, OUTPUT);
+  pinMode(a3, OUTPUT);
+  pinMode(a2, OUTPUT);
+  pinMode(a1, OUTPUT);
+  pinMode(a0, OUTPUT);
 
   // CD4511 --> number
-  pinMode(A, OUTPUT);
-  pinMode(B, OUTPUT);
-  pinMode(C, OUTPUT);
-  pinMode(D, OUTPUT);
-  pinMode(DP, OUTPUT);
+  pinMode(a, OUTPUT);
+  pinMode(b, OUTPUT);
+  pinMode(c, OUTPUT);
+  pinMode(d, OUTPUT);
+  pinMode(dp, OUTPUT);
 }
 
 //--------------------------------------------------//
 
 void sevSeg::clear()
 {
+  Number = "";
 }
 
 //--------------------------------------------------//
@@ -91,16 +105,16 @@ void sevSeg::SegWrite(int digit, int SegNumber)
     switch (i)
     {
     case 3:
-      digitalWrite(A3, bitRead(DIGIT[digit], i));
+      digitalWrite(a3, bitRead(DIGIT[digit], i));
       break;
     case 2:
-      digitalWrite(A2, bitRead(DIGIT[digit], i));
+      digitalWrite(a2, bitRead(DIGIT[digit], i));
       break;
     case 1:
-      digitalWrite(A1, bitRead(DIGIT[digit], i));
+      digitalWrite(a1, bitRead(DIGIT[digit], i));
       break;
     case 0:
-      digitalWrite(A0, bitRead(DIGIT[digit], i));
+      digitalWrite(a0, bitRead(DIGIT[digit], i));
       break;
     }
   }
@@ -113,19 +127,19 @@ void sevSeg::SegWrite(int digit, int SegNumber)
     switch (i)
     {
     case 4:
-      digitalWrite(D, bitRead(SEG[SegNumber], i));
+      digitalWrite(d, bitRead(SEG[SegNumber], i));
       break;
     case 3:
-      digitalWrite(C, bitRead(SEG[SegNumber], i));
+      digitalWrite(c, bitRead(SEG[SegNumber], i));
       break;
     case 2:
-      digitalWrite(B, bitRead(SEG[SegNumber], i));
+      digitalWrite(b, bitRead(SEG[SegNumber], i));
       break;
     case 1:
-      digitalWrite(A, bitRead(SEG[SegNumber], i));
+      digitalWrite(a, bitRead(SEG[SegNumber], i));
       break;
     case 0:
-      digitalWrite(DP, bitRead(SEG[SegNumber], i));
+      digitalWrite(dp, bitRead(SEG[SegNumber], i));
       break;
     }
   }
@@ -214,12 +228,21 @@ void sevSeg::printChar(char *Print)
 {
 
   NumberWthoutDot = strlen(Print);
-  for (int i = 0; i <= strlen(Print); i++)
+  for (int i = 0; i < strlen(Print); i++)
   {
     if (Print[i] == '.')
     {
       NumberWthoutDot = NumberWthoutDot - 1;
       DotPos = i;
+    }
+
+    if (Print[i] == '0' || Print[i] == '1' || Print[i] == '2' || Print[i] == '3' || Print[i] == '4' || Print[i] == '5' || Print[i] == '6' || Print[i] == '7' || Print[i] == '8' || Print[i] == '9' || Print[i] == '-' || Print[i] == '.' || Print[i] == ' ')
+    {
+      ErrorChar = 0;
+    }
+    else
+    {
+      ErrorChar = 1;
     }
   }
 
@@ -227,11 +250,14 @@ void sevSeg::printChar(char *Print)
   {
     Number = "-......"; //Overflow
   }
+  else if (ErrorChar == 1)
+  {
+    Number = " ......"; //unknown character
+  }
   else
   {
     Number = Print;
   }
-
 }
 
 //--------------------------------------------------//
@@ -241,7 +267,11 @@ void sevSeg::multiplex()
 
   if (millis() - PreviousMillis >= Interval)
   {
-    if (Number[0] == '-')
+    if (Number == "")
+    {
+      SegWrite(0, 11);
+    }
+    else if (Number[0] == '-')
     {
 
       SegWrite(6, 8);
