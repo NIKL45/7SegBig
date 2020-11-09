@@ -3,6 +3,10 @@
 
 #include "Arduino.h"
 
+/* !!! --> it's way more stable when using printChar(char) 
+          (and converting the number to char in the loop), 
+          instead of using printNum() <-- !!! */
+
 class sevSeg
 {
 public:

@@ -5,7 +5,7 @@ unsigned long PreviousMillis = 0;
 const long Interval = 2;
 int Index = 0;
 const char *Number;
-int NumberOnlyLen;
+int NumberWthoutDot;
 int DotPos;
 
 //NUMBER:
@@ -36,6 +36,10 @@ const uint8_t DIGIT[8] = {
     B1111  // nothing
 };
 
+//--------------------------------------------------//
+//////////////////////////////////////////////////////
+//--------------------------------------------------//
+
 sevSeg::sevSeg()
 {
   // PINS:
@@ -50,6 +54,8 @@ sevSeg::sevSeg()
 #define D 19
 #define DP 21
 }
+
+//--------------------------------------------------//
 
 void sevSeg::init()
 {
@@ -67,15 +73,18 @@ void sevSeg::init()
   pinMode(DP, OUTPUT);
 }
 
+//--------------------------------------------------//
+
 void sevSeg::clear()
 {
 }
+
+//--------------------------------------------------//
 
 void sevSeg::SegWrite(int digit, int SegNumber)
 {
   ////////////////////////////
   //DIGIT:
-
   for (int i = 3; i >= 0; i--)
   {
     //Serial.print(bitRead(DIGIT[digit], i));
@@ -122,10 +131,13 @@ void sevSeg::SegWrite(int digit, int SegNumber)
   }
 }
 
-// ToDo: void sevSeg::print(double )
-// char Tmp[18];
-// String TmpStr = String(double );
-// TmpStr.toCharArray(Tmp, 18);
+//--------------------------------------------------//
+//--------------------------------------------------//
+//--------------------------------------------------//
+
+/* !!! --> it's way more stable when using printChar(char) 
+          (and converting the number to char in the loop), 
+          instead of using printNum() <-- !!! */
 
 void sevSeg::printNum(float Num)
 {
@@ -135,6 +147,8 @@ void sevSeg::printNum(float Num)
   sevSeg::printChar(Tmp);
 }
 
+//--------------------------------------------------//
+
 void sevSeg::printNum(long Num)
 {
   char Tmp[100];
@@ -142,6 +156,8 @@ void sevSeg::printNum(long Num)
   TmpStr.toCharArray(Tmp, 100);
   sevSeg::printChar(Tmp);
 }
+
+//--------------------------------------------------//
 
 void sevSeg::printNum(unsigned long Num)
 {
@@ -151,6 +167,8 @@ void sevSeg::printNum(unsigned long Num)
   sevSeg::printChar(Tmp);
 }
 
+//--------------------------------------------------//
+
 void sevSeg::printNum(short Num)
 {
   char Tmp[100];
@@ -158,6 +176,8 @@ void sevSeg::printNum(short Num)
   TmpStr.toCharArray(Tmp, 100);
   sevSeg::printChar(Tmp);
 }
+
+//--------------------------------------------------//
 
 void sevSeg::printNum(double Num)
 {
@@ -167,6 +187,8 @@ void sevSeg::printNum(double Num)
   sevSeg::printChar(Tmp);
 }
 
+//--------------------------------------------------//
+// only on point allowed
 void sevSeg::printNum(int Num)
 {
   char Tmp[100];
@@ -174,6 +196,8 @@ void sevSeg::printNum(int Num)
   TmpStr.toCharArray(Tmp, 100);
   sevSeg::printChar(Tmp);
 }
+
+//--------------------------------------------------//
 
 void sevSeg::printNum(unsigned int Num)
 {
@@ -183,32 +207,34 @@ void sevSeg::printNum(unsigned int Num)
   sevSeg::printChar(Tmp);
 }
 
+//--------------------------------------------------//
 
+// !!! only one point allowed !!!
 void sevSeg::printChar(char *Print)
 {
 
-  NumberOnlyLen = strlen(Print);
+  NumberWthoutDot = strlen(Print);
   for (int i = 0; i <= strlen(Print); i++)
   {
     if (Print[i] == '.')
     {
-      NumberOnlyLen = NumberOnlyLen - 1;
+      NumberWthoutDot = NumberWthoutDot - 1;
       DotPos = i;
     }
   }
 
-  if ((NumberOnlyLen > 6 && Print[0] != '-') || (NumberOnlyLen > 7 && Print[0] == '-') || (NumberOnlyLen < strlen(Print) - 1))
+  if ((NumberWthoutDot > 6 && Print[0] != '-') || (NumberWthoutDot > 7 && Print[0] == '-') || (NumberWthoutDot < strlen(Print) - 1))
   {
-    Number = "-......";
+    Number = "-......"; //Overflow
   }
   else
   {
     Number = Print;
   }
 
-  // Serial.print("len: ");
-  // Serial.println(strlen(Number));
 }
+
+//--------------------------------------------------//
 
 void sevSeg::multiplex()
 {
@@ -357,10 +383,6 @@ void sevSeg::multiplex()
                         }
                         else
                         {
-                          // if (Number[Index] == ' ')
-                          // {
-                          //   SegWrite((strlen(Number) - Index) - 1, 11);
-                          // }
                         }
                       }
                     }
@@ -375,11 +397,11 @@ void sevSeg::multiplex()
 
     ////////////////////////////////
 
-    if (NumberOnlyLen > 6 && Number[0] != '-' && Index <= 1)
+    if (NumberWthoutDot > 6 && Number[0] != '-' && Index <= 1)
     {
       Index = 6;
     }
-    else if (NumberOnlyLen > 7 && Number[0] == '-' && Index <= 1)
+    else if (NumberWthoutDot > 7 && Number[0] == '-' && Index <= 1)
     {
       Index = 7;
     }
@@ -395,51 +417,3 @@ void sevSeg::multiplex()
     PreviousMillis = millis();
   }
 }
-
-// void sevSeg::multiplex()
-// {
-//     if (digit != 0)
-//     {
-//         pinMode(Dig[digit - 1], INPUT);
-//     }
-//     else
-//     {
-//         pinMode(Dig[nbdigit - 1], INPUT);
-//     }
-//     if (disp)
-//     {                                                             //si affichage valide
-//         if (cursr && (digit == pos) && ((millis() % 1000) < 500)) //affichage du curseur
-//         {
-//             segwrite('_');
-//         }
-//         else
-//         {
-//             segwrite(disply[digit]);
-//         } //ou du caractere
-//         if (dot[digit])
-//         {
-//             digitalWrite(Seg[7], !common);
-//         } //affichage du point
-//         else
-//         {
-//             digitalWrite(Seg[7], common);
-//         }
-//     }
-//     else
-//     {
-//         segwrite(' ');
-//         digitalWrite(Seg[7], common);
-//     }
-//     if (driver)
-//     {
-//         digitalWrite(Dig[digit], !common);
-//     }
-//     else
-//     {
-//         digitalWrite(Dig[digit], common);
-//     };
-//     pinMode(Dig[digit], OUTPUT);
-//     digit++;
-//     if (digit == nbdigit)
-//         digit = 0;
-// }
