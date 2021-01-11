@@ -44,7 +44,7 @@ const long MIN_OPERATION_INTERVAL = 600L;
                               (and converting the number to char in the loop), 
                               instead of using printNum() <-- !!! */
 
-sevSeg Display(15, 14, 13, 12, 4, 5, 18, 19, 21);
+sevSeg Display(26, 12, 14, 27, 25, 35, 32, 33, 13);
 
 /***********************/
 
